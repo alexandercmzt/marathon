@@ -1,9 +1,17 @@
 
 
-- Number of events participated in for each year (int). Not excluding any events. **
+- Number of events participated in for each year (int). Not excluding any events.
 - Gender (include non-disclosed). Female 0, male 1.
 - Average age, otherwise take value. Default value 30.
-- Number of times attended the Montreal marathon. **
-- Average distance from the average (across all participants) 
+- Number of times attended the Montreal marathon.
+- Average distance from the average (across all participants) in seconds. 
+	- negative 1 is equivalent to the worst.
 
-** Must modify to not include 2015 values.
+Do not include 2015 data.
+
+Output
+- feature array by userID. 
+- feature array by userID without those who did not participate in 2015.
+- feature array by userID including 2015 values for final iteration predicting 2016
+- array containing participation in montreal 2015 marathon by userID
+- array containing finish time in montreal 2015 marathon by userID without those who did not participate. 
