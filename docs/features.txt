@@ -1,5 +1,9 @@
 
 
-- Number of events participated in for each year (int). Not excluding any events.
-- Gender
-- Age max
+- Number of events participated in for each year (int). Not excluding any events. **
+- Gender (include non-disclosed). Female 0, male 1.
+- Average age, otherwise take value. Default value 30.
+- Number of times attended the Montreal marathon. **
+- Average distance from the average (across all participants) 
+
+** Must modify to not include 2015 values.
