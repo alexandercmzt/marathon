@@ -76,7 +76,6 @@ def createFeatureArrays(participants, isTraining):
                 year2014 += 1
             elif "2015" in race[0]:
                 year2015 += 1
-                print race[1]
                 if "Marathon Oasis Rock 'n' Roll de Montreal" in strip_accents(race[1].lower()) \
                         and "marathon" in race[2].lower() \
                         and "demi" not in race[2].lower():
@@ -190,10 +189,8 @@ def getAverageMarathonTimes(participants):
 
     for race in marathonTotalTime:
         marathonTotalTime[race] = [max(marathonTotalTime[race]) if (x == -1) else x for x in marathonTotalTime[race]]
-        print race, max(marathonTotalTime[race])
     for race in marathonTotalTime:
         marathonAverageTime[race] = sum(marathonTotalTime[race]) / len(marathonTotalTime[race])
-        print "average", race, marathonAverageTime[race]
 
     return marathonTotalTime, marathonAverageTime
 
