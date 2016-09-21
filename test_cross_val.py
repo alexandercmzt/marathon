@@ -22,10 +22,6 @@ structures = [
     {
         'powers': [[1,2,3]],
         'products': []
-    },
-    {
-        'powers': [[1,2,3,4]],
-        'products': []
     }
 ]
 

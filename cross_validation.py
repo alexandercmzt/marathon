@@ -155,8 +155,10 @@ def crossValidate(X, y, modelStructures, regressor, n):
             fmg = FeatureMatrixGenerator(trainingSet[0], structure)
             X = fmg.generate()
             y = np.array(trainingSet[1])
+            print "X:", X
+            print "y:", y
             lr = regressor(X, y)
-            lr.train()
+            lr.train(False) # remove false for gradient descent
             trainErr = lr.cost(X, y)
             fmgVal = FeatureMatrixGenerator(validationSet[0], structure)
             XVal = fmgVal.generate()
