@@ -1,5 +1,6 @@
 import csv
 import random
+import numpy as np
 from classifiers import NaiveBayes as NB
 
 def loadCsv(filename):
@@ -28,14 +29,16 @@ def test():
     dataset = loadCsv(filename)
     splitRatio = 0.67
     trainingSet, testSet = splitDataset(dataset, splitRatio)
+    tSet = np.array(trainingSet)
+    vSet = np.array(testSet)
     featureTypes = [True, True, True, True, True, True, True, True]
-    print('Split {0} rows into train={1} and test={2} rows').format(len(dataset), len(trainingSet), len(testSet))
-    nb = NB(trainingSet, featureTypes)
+    print('Split {0} rows into train={1} and test={2} rows').format(len(dataset), len(tSet), len(vSet))
+    nb = NB(tSet, featureTypes)
     summaries = nb.train()
     #print('Summaries: {0}').format(summaries)
-    predictions = nb.predict(testSet)
+    predictions = nb.predict(vSet)
     #print('Predictions: {0}').format(predictions)
-    accuracy = nb.getAccuracy(testSet, predictions)
+    accuracy = nb.getAccuracy(vSet, predictions)
     print('Accuracy: {0}%').format(accuracy)
 
 test()

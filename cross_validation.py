@@ -4,6 +4,7 @@ import numpy as np
 import random
 from classifiers import LinearRegressor as LinReg
 from classifiers import LogisticRegressor as LogReg
+from classifiers import NaiveBayes as NB
 
 class FeatureMatrixGenerator(object):
     '''
@@ -38,6 +39,22 @@ class FeatureMatrixGenerator(object):
         if len(value['powers']) != len(self.X[0]):
             raise Exception("Structure dimension is off")
         self._structure = value
+
+    def deduceFeatureTypes(self, basicFTypes):
+        fTypes = []
+        # power terms
+        powerTerms = self.structure['powers']
+        for i, powers in enumerate(powerTerms):
+            currType = basicTypes(i)
+            for x in range(len(powers)):
+                fTypes.append(currType)
+
+        # product terms - these should only ever be products of continuous types
+        products = self.structure['products']
+        for i in range(len(products)):
+            fTypes.append(True)
+
+        return fTypes
 
     def generate(self):
         '''
@@ -146,6 +163,36 @@ def crossValidate(X, y, modelStructures, regressor, n):
             yVal = np.array(validationSet[1])
             validationErr = regressor.cost(XVal, yVal)
             currModelErrors.append([trainErr, validationErr])
+        errors.append(get_avg_errors(currModelErrors))
+
+    bestModelIdx = get_index_of_min_err(errors)
+    print("Best model index: {0} \nBest model structure: {1}").format(bestModelIdx, modelStructures[bestModelIdx])
+    print "Model errors:\nmodel\ttrain\tvalidation"
+    for i, v in enumerate(errors):
+        print("{0}\t{1}\t{2}").format(i, v[0], v[1])
+    return bestModelIdx
+
+def crossValidateNB(X, y, featureTypes, modelStructures, n):
+    dataPartitioner = DataPartitioner(n, X, y)
+    errors = []
+    for structure in modelStructures:
+        currModelErrors = []
+        for i in range(n):
+            trainingSet, validationSet = dataPartitioner.getPartitions(i)
+            fmg = FeatureMatrixGenerator(trainingSet[0], structure)
+            X = fmg.generate()
+            y = np.array(trainingSet[1])
+            fTypes = fmg.deduceFeatureTypes(featureTypes)
+            nb = NB(X, y, fTypes)
+            nb.train()
+            tPredictions = nb.predict(X, y)
+            tErr = nb.error(X, y, tPredictions)
+            fmgVal = FeatureMatrixGenerator(validationSet[0], structure)
+            XVal = fmgVal.generate()
+            yVal = np.array(validationSet[1])
+            vPredictions = nb.predict(XVal, yVal)
+            vErr = nb.error(XVal, yVal, vPredictions)
+            currModelErrors.append([tErr, vErr])
         errors.append(get_avg_errors(currModelErrors))
 
     bestModelIdx = get_index_of_min_err(errors)

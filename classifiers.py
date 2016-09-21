@@ -37,7 +37,7 @@ class LinearRegressor:
 			retvar = X.dot(self.w)
 		return retvar
 
-	def cost(self,X, y, w = self.w):
+	def cost(self,X, y):
 		prediction_matrix = self.predict(X)
 		difference = y - prediction_matrix
 		return difference.T.dot(difference)
@@ -113,7 +113,7 @@ class LogisticRegressor():
 			retvar = self.sigmoid(X.dot(self.w))
 		return retvar
 
-	def cost(self, X, y, w = self.w):
+	def cost(self, X, y):
 		prediction = self.predict(X)
 		return -(y.T.dot(np.log(prediction)) + (1-y).T.dot(np.log(1-prediction)))
 
@@ -157,14 +157,21 @@ class NaiveBayes:
       predictions should be the return from predict
     '''
 
-    def __init__(self, trainingSet, featureTypes):
+    def __init__(self, X, y, featureTypes):
         '''
         featureTypes is a list indicating true at index i if feature i is continuous, and false
         if feature i is discrete
         trainingSet is a matrix where each entry is a vector with nth entry = y and previous n-1 entries = feature values
         '''
-        self.trainingSet = trainingSet
+        self.trainingSet = self.compose(X, y)
         self.featureTypes = featureTypes
+
+    def compose(self, X, y):
+        composed = []
+        for i, v in enumerate(X):
+            entry = v.append(y[i])
+            composed.append(entry)
+        return composed
 
     def separateByClass(self, dataset):
         '''
@@ -327,5 +334,10 @@ class NaiveBayes:
         self.summaries = self.summarizeByClass(self.featureTypes, self.trainingSet)
         return self.summaries
 
-    def predict(self, dataSet):
+    def predict(self, X, y):
+        dataSet = self.compose(X, y)
         return self.getPredictions(self.summaries, dataSet)
+
+    def error(self, X, y, predictions):
+        testSet = self.compose(X, y)
+        return 100.0 - self.getAccuracy(testSet, predictions)
