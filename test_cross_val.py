@@ -19,6 +19,12 @@ def loadPickle(filename):
     print "Done"
     return p
 
+def findBestModel(X, y, models, regressor, n):
+    crossValidate(X, y, models, regressor, n)
+
+# script
+
+# load data
 X_lg = loadPickle('data/X_participantDataForRaceTimes.p')
 X_classify = loadPickle('data/X_participantDataForRaceParticipation.p')
 y_lg = loadPickle('data/Y_montrealMarathonTime.p')
@@ -33,9 +39,7 @@ if len(X_classify) != len(y_classify):
 print("Using {0} instances for predicting race times").format(len(y_lg))
 print("Using {0} instances for predicting participation").format(len(y_classify))
 
-def findBestModel(X, y, models, regressor, n):
-    crossValidate(X, y, models, regressor, n)
-
+# determine alpha
 iterateAlpha(X_lg, y_lg, LinReg)
 
 # define the number of partitions
