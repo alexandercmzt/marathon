@@ -84,8 +84,14 @@ def createFeatureArrays(participants, isTraining):
                     montreal2015FinishTime = getFinishTime(race[3], raceName, marathonTotalTime)
                     if isTraining:  # if this is the training set, set their time to the average time.
                         year2015 -= 1
-                        distanceFromAverageSum += marathonAverageTime[raceName]
+                        distanceFromAverageSum += 0
                         numberOfMarathons += 1
+                        raceAge, potentialGender = processAge(race[4])
+                        if raceAge is not None:
+                            ageSum += raceAge
+                            totalNumberOfAgedRaces += 1
+                        if potentialGender is not None:
+                            gender = potentialGender
                         continue
             elif "2016" in race[0]:
                 year2016 += 1
@@ -102,7 +108,7 @@ def createFeatureArrays(participants, isTraining):
                 if "montreal" in strip_accents(race[1].lower()):
                     numberOfMontrealMarathons += 1
                 if any(word in race[2].lower() for word in ["demi", "half"]):
-                    raceName = strip_accents(race[1].lower()) + " demi"
+                    continue                    
                 else:
                     raceName = strip_accents(race[1].lower())
                 finishSeconds = getFinishTime(race[3], raceName, marathonTotalTime)
