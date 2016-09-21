@@ -42,7 +42,7 @@ class LinearRegressor:
             w = self.w
     	prediction_matrix = self.predict(X)
     	difference = y - prediction_matrix
-    	return difference.T.dot(difference)
+    	return (1/float(X.shape[0]))*difference.T.dot(difference)
 
     def deriv_cost(self,X, y, w):
     	return 2*(X.T.dot(X).dot(w)-X.T.dot(y))
@@ -73,11 +73,11 @@ class LinearRegressor:
     def train(self,gd=True):
     	if not gd:
     		wts = self.closed_form_solve(self.X,self.y)
-    		print "OPTIMAL WEIGHTS: " + str(wts)
+    		#print "OPTIMAL WEIGHTS: " + str(wts)
     	else:
     		wts, cost_history = self.gradient_descent(self.X,self.y)
-    		print "ENDED AFTER " + str(len(cost_history)) + " GRADIENT ITERATIONS"
-    		print "OPTIMAL WEIGHTS: " + str(wts)
+    		#print "ENDED AFTER " + str(len(cost_history)) + " GRADIENT ITERATIONS"
+    		#print "OPTIMAL WEIGHTS: " + str(wts)
     		return cost_history
 
 
@@ -118,7 +118,7 @@ class LogisticRegressor():
         if w == None:
             w = self.w
     	prediction = self.predict(X)
-    	return -(y.T.dot(np.log(prediction)) + (1-y).T.dot(np.log(1-prediction)))
+    	return -(1/float(X.shape[0]))*(y.T.dot(np.log(prediction)) + (1-y).T.dot(np.log(1-prediction)))
 
     def deriv_cost(self, X, y, w):
     	prediction = self.predict(X)
@@ -146,8 +146,8 @@ class LogisticRegressor():
     def train(self):
     	wts, cost_history = self.gradient_descent(self.X,self.y)
     	#print "COST_HISTORY: " + str(cost_history)
-    	print "Ended after " + str(len(cost_history)) + " iterations"
-    	print "Optimal weights: " + str(wts)
+    	#print "Ended after " + str(len(cost_history)) + " iterations"
+    	#print "Optimal weights: " + str(wts)
     	return cost_history
 
 
@@ -341,6 +341,6 @@ class NaiveBayes:
         dataSet = self.compose(X, y)
         return self.getPredictions(self.summaries, dataSet)
 
-    def error(self, X, y, predictions):
+    def cost(self, X, y, predictions):
         testSet = self.compose(X, y)
         return 100.0 - self.getAccuracy(testSet, predictions)
