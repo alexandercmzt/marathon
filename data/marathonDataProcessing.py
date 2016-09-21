@@ -76,7 +76,7 @@ def createFeatureArrays(participants, isTraining):
                 year2014 += 1
             elif "2015" in race[0]:
                 year2015 += 1
-                if "Marathon Oasis Rock 'n' Roll de Montreal" in strip_accents(race[1].lower()) \
+                if "Marathon Oasis Rock 'n' Roll de Montreal".lower() in strip_accents(race[1].lower()) \
                         and "marathon" in race[2].lower() \
                         and "demi" not in race[2].lower():
                     raceName = strip_accents(race[1].lower())
@@ -159,6 +159,8 @@ def createFeatureArrays(participants, isTraining):
                 distanceFromAverageAverage
             ])
 
+
+    print participantDataForRaceTimes
     # Storing final array data.
 #    pickle.dump(np.array(participantDataFinalFor2016), open('final_participantDataFinalFor2016.p', 'wb'))
     pickle.dump(np.array(participantDataForRaceParticipation), open('X_participantDataForRaceParticipation.p', 'wb'))
