@@ -29,7 +29,6 @@ def splitDataset(dataset, splitRatio):
         trainSet.append(copy.pop(index))
     return [trainSet, copy]
 
-
 def separateByClass(dataset):
     '''
     returns a map of class to all points in dataset that fall into that class
