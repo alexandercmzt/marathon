@@ -31,7 +31,7 @@ if len(X_classify) != len(y_classify):
     print "ERROR: regression datasets are of different lengths"
 
 print("Using {0} instances for predicting race times").format(len(y_lg))
-print("Using {0} instances for predicting participation").fomat(len(y_classify))
+print("Using {0} instances for predicting participation").format(len(y_classify))
 
 def findBestModel(X, y, models, regressor, n):
     crossValidate(X, y, models, regressor, n)
