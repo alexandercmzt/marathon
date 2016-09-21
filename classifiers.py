@@ -35,7 +35,7 @@ class LinearRegressor:
 			retvar = X.dot(self.w)
 		return retvar
 
-	def cost(self,X, y, w):	
+	def cost(self,X, y, w):
 		prediction_matrix = self.predict(X)
 		difference = y - prediction_matrix
 		return difference.T.dot(difference)
@@ -99,7 +99,7 @@ class LogisticRegressor():
 		self.w = np.random.rand(self.n+1)
 
 	def sigmoid(self,x):
-			return 1/(1+np.exp(-x))	
+			return 1/(1+np.exp(-x))
 
 	def predict(self,X):
 		try:
@@ -144,8 +144,3 @@ class LogisticRegressor():
 		print "Ended after " + str(len(cost_history)) + " iterations"
 		print "Optimal weights: " + str(wts)
 		return cost_history
-
-
-
-
-
