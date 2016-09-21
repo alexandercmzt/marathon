@@ -157,11 +157,11 @@ def crossValidate(X, y, modelStructures, regressor, n):
             y = np.array(trainingSet[1])
             lr = regressor(X, y)
             lr.train()
-            trainErr = regressor.cost(X, y)
+            trainErr = lr.cost(X, y)
             fmgVal = FeatureMatrixGenerator(validationSet[0], structure)
             XVal = fmgVal.generate()
             yVal = np.array(validationSet[1])
-            validationErr = regressor.cost(XVal, yVal)
+            validationErr = lr.cost(XVal, yVal)
             currModelErrors.append([trainErr, validationErr])
         errors.append(get_avg_errors(currModelErrors))
 

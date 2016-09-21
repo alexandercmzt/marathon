@@ -37,7 +37,7 @@ class LinearRegressor:
 			retvar = X.dot(self.w)
 		return retvar
 
-	def cost(self,X, y):
+	def cost(self,X, y, w=self.w):
 		prediction_matrix = self.predict(X)
 		difference = y - prediction_matrix
 		return difference.T.dot(difference)
@@ -113,7 +113,7 @@ class LogisticRegressor():
 			retvar = self.sigmoid(X.dot(self.w))
 		return retvar
 
-	def cost(self, X, y):
+	def cost(self, X, y, w=self.w):
 		prediction = self.predict(X)
 		return -(y.T.dot(np.log(prediction)) + (1-y).T.dot(np.log(1-prediction)))
 
