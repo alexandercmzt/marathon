@@ -1,7 +1,7 @@
 # This module implements cross validation of prospective data models
 
 import numpy as np
-from random import shuffle
+import random
 from classifiers import LinearRegressor as LinReg
 from classifiers import LogisticRegressor as LogReg
 
@@ -10,10 +10,9 @@ class FeatureMatrixGenerator(object):
     This class generates feature matrices given a dataset an a datastructure
     indicating the powers and product terms you want in the output matrix
     '''
-    def __init__(self, X, y, structure):
+    def __init__(self, X, structure):
         ''' X is a 2d array '''
         self.X = X
-        self.y = y
         self.structure = structure
 
     @property
@@ -70,104 +69,88 @@ class FeatureMatrixGenerator(object):
 
         # convert to numpy array
         retX = np.array(featureMatrix)
-        y = np.array(self.y)
-        return retX, y
+        return retX
 
 class DataPartitioner:
     '''
-    This class partitions a dataset X, ys into n parts of equal size
+    This class partitions a dataset X, y into n parts of equal size
+    partitions, the key datastructure of this class, is a list of two-element
+    lists: [X instances, y instances]
     '''
 
-    def __init__(self, n, X, ys):
+    def __init__(self, n, X, y):
         self.n = n
-        self.partitions = self.partition(n, X, ys)
+        self.partitions = self.partition(n, X, y)
 
-    def partition(self, n, X, ys):
-        chunks = self.initializeChunks(n, X, ys)
-        for index, instance in enumerate(X):
-            partitionIndex = index % n
-            chunks[partitionIndex]['X'].append(instance)
-            for i, v in enumerate(ys):
-                key = "y" + str(i)
-                chunks[partitionIndex][key].append(v[index])
-        return chunks
-
-    def initializeChunks(self, n, X, ys):
+    def partition(self, n, X, y):
         chunks = []
-        for i in range(n):
-            chunks.append({'X':[]})
-            for j in range(len(ys)):
-                key = "y" + str(j)
-                chunks[i][key] = []
+        for i in range(len(X)):
+            partitionIndex = i % n
+            if partitionIndex >= len(chunks):
+                chunks.append([[],[]])
+            chunks[partitionIndex][0].append(X[i])
+            chunks[partitionIndex][1].append(y[i])
         return chunks
 
     def getPartitions(self, i):
         ''' returns the ith partition as the validation set and the remaining
         partitions as the training set '''
         validationSet = self.partitions[i]
-        trainingSet = {}
+        trainingSet = [[],[]]
         for index, partition in enumerate(self.partitions):
             if index != i:
-                for key, value in partition.iteritems():
-                    if key not in trainingSet:
-                        trainingSet[key] = []
-                    trainingSet[key].extend(value)
+                trainingSet[0].extend(partition[0])
+                trainingSet[1].extend(partition[1])
         return trainingSet, validationSet
 
-    def getPartitionsForOneY(self, i, y):
-        ''' returns the training and validation sets in a convenient format if
-        you only want to examine a single y '''
-        training, validation = self.getPartitions(i)
-        reducedTraining = {}
-        reducedValidation = {}
-        for key in training.keys():
-            if key != 'X' or key != ('y' + str(y)):
-                del training[key]
-                del validation[key]
-        yt = training['y' + str(y)]
-        yv = validation['y' + str(y)]
-        del training['y' + str(y)]
-        del validation['y' + str(y)]
-        training['y'] = yt
-        validation['y'] = yv
-        return training, validation
+####################
+# Cross validation
+####################
 
+def get_avg_errors(errs):
+    ''' returns average training and validation errors given an array of pairs '''
+    totals = [0.0,0.0]
+    for i,v in enumerate(errs):
+        totals[0] += v[0]
+        totals[1] += v[1]
+    return map(lambda x: x/len(errs), totals)
 
-def crossValidateLinReg(X, ys, modelStructures):
-    ''' takes in data and a list of model structures and returns the best model '''
-    # partition the data
-    n = 10 # number of partitions
-    dataPartitioner = DataPartitioner(n, X, ys)
+def get_index_of_min_err(data):
+    ''' takes array of [avg training error, avg validation error] entries, and returns index with the lowest validation error '''
+    v_errs = map(lambda (x,y): y, data)
+    min_err = min(v_errs)
+    return v_errs.index(min_err)
+
+def crossValidate(X, y, modelStructures, regressor, n):
+    ''' takes in data and a list of model structures and returns the best model
+    X should be a matrix with one feature vector per row
+    y should be a list of the outputs corresponding to each feature vector in X
+    modelStructures is a list of dictionaries, each of which describes a different feature set to be tested
+    regressor is a reference to whichever regression class you want to use (e.g. regressor = LinReg)
+    n is the number of partitions desired
+    '''
+    dataPartitioner = DataPartitioner(n, X, y)
     errors = []
     for structure in modelStructures:
         currModelErrors = []
         for i in range(n):
-            trainingSet, validationSet = getPartitionsForOneY(i, 0)
-            fmg = FeatureMatrixGenerator(trainingSet['X'], trainingSet['y'])
-            X, y = fmg.generate()
-            lr = LinReg(X, y)
+            trainingSet, validationSet = dataPartitioner.getPartitions(i)
+            fmg = FeatureMatrixGenerator(trainingSet[0], structure)
+            X = fmg.generate()
+            y = np.array(trainingSet[1])
+            lr = regressor(X, y)
             lr.train()
-            trainErr = lr.
-            currModelErrors.append([])
+            trainErr = random.random()#lr.err(X, y)
+            fmgVal = FeatureMatrixGenerator(validationSet[0], structure)
+            XVal = fmgVal.generate()
+            yVal = np.array(validationSet[1])
+            validationErr = random.random()#lr.err(XVal, yVal)
+            currModelErrors.append([trainErr, validationErr])
+        errors.append(get_avg_errors(currModelErrors))
 
-
-
-def crossValidateLogReg(X, ys, modelStructures):
-
-
-    - Loop: for i = 0 to n-1
-      - extract the partition i as a test set and the rest of the partitions as a training set using the method described above
-      - convert them into a matrix X which corresponds to the model and vector y (y will be the same, but just convert to array with np)
-        - **note** NO NEED TO ADD COLUMN OF 1s to X
-      - create a LinearRegressor using X and y and train the model
-      - compute the error of the model against the training data and the error against the test set and record these errors
-    - average training and validation errors over all iterations of loop and record them in a map from model to training error
-
-
-X = [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],[8,8],[9,9],[10,10]]
-y = [1,2,3,4,5,6,7,8,9,10]
-y1 = [-1,-2,-3,-4,-5,-6,-7,-8,-9,-10]
-dp = DataPartitioner(3, X, [y, y1])
-partitions = dp.getPartitions(0)
-print "training", partitions[0]
-print "validation", partitions[1]
+    bestModelIdx = get_index_of_min_err(errors)
+    print("Best model index: {0} \nBest model structure: {1}").format(bestModelIdx, modelStructures[bestModelIdx])
+    print "Model errors:\nmodel\ttrain\tvalidation"
+    for i, v in enumerate(errors):
+        print("{0}\t{1}\t{2}").format(i, v[0], v[1])
+    return bestModelIdx
