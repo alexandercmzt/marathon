@@ -18,7 +18,7 @@ def main():
     :return: null
     """
     participants = dict()
-    with open('docs/Project1_data.csv') as csvfile:
+    with open('/Users/Caitrin/desktop/marathon/docs/Project1_data.csv') as csvfile:
         reader = csv.reader(csvfile)
         reader.next()
         for row in reader:
@@ -119,7 +119,6 @@ def createFeatureArrays(participants, isTraining):
 
         if isTraining:
             participantDataForRaceParticipation.append([
-                participantNumber,
                 year2012,
                 year2013,
                 year2014,
@@ -132,7 +131,6 @@ def createFeatureArrays(participants, isTraining):
 
             if attendedMontreal2015:
                 participantDataForRaceTimes.append([
-                    participantNumber,
                     year2012,
                     year2013,
                     year2014,
@@ -144,14 +142,13 @@ def createFeatureArrays(participants, isTraining):
                 ])
 
             if attendedMontreal2015:
-                montrealMarathonParticipaton.append([participantNumber, 1])
-                montrealMarathonTime.append([participantNumber], montreal2015FinishTime)
+                montrealMarathonParticipaton.append(1)
+                montrealMarathonTime.append(montreal2015FinishTime)
             else:
-                montrealMarathonParticipaton.append([participantNumber, 0])
+                montrealMarathonParticipaton.append(0)
 
         if not isTraining:
             participantDataFinalFor2016.append([
-                participantNumber,
                 year2013,
                 year2014,
                 year2015,
@@ -163,7 +160,7 @@ def createFeatureArrays(participants, isTraining):
             ])
 
     # Storing final array data.
-    pickle.dump(np.array(participantDataFinalFor2016), open('final_participantDataFinalFor2016.p', 'wb'))
+#    pickle.dump(np.array(participantDataFinalFor2016), open('final_participantDataFinalFor2016.p', 'wb'))
     pickle.dump(np.array(participantDataForRaceParticipation), open('X_participantDataForRaceParticipation.p', 'wb'))
     pickle.dump(np.array(participantDataForRaceTimes), open('X_participantDataForRaceTimes.p', 'wb'))
     pickle.dump(np.array(montrealMarathonParticipaton), open('Y_montrealMarathonParticipaton.p', 'wb'))
