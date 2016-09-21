@@ -6,8 +6,13 @@ from classifiers import LogisticRegressor as LogReg
 from classifiers import NaiveBayes as NB
 
 def iterateAlpha(X, y, regressor):
-	alpha_list = [0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]
-	for alpha in alpha_list:
+    alpha_list = []
+    start = 100000000
+    for i in range(20):
+        alpha_list.append(start)
+        start *= 10
+    print alpha_list
+    for alpha in alpha_list:
 		print "[Alpha = " + str(alpha) + "][Linear Regression]"
 		r1 = regressor(X, y, alpha)
 		r1.train()
@@ -19,6 +24,12 @@ def loadPickle(filename):
     print "Done"
     return p
 
+def findBestModel(X, y, models, regressor, n):
+    crossValidate(X, y, models, regressor, n)
+
+# script
+
+# load data
 X_lg = loadPickle('data/X_participantDataForRaceTimes.p')
 X_classify = loadPickle('data/X_participantDataForRaceParticipation.p')
 y_lg = loadPickle('data/Y_montrealMarathonTime.p')
@@ -33,10 +44,8 @@ if len(X_classify) != len(y_classify):
 print("Using {0} instances for predicting race times").format(len(y_lg))
 print("Using {0} instances for predicting participation").format(len(y_classify))
 
-def findBestModel(X, y, models, regressor, n):
-    crossValidate(X, y, models, regressor, n)
-
-iterateAlpha(X_lg, y_lg, LinReg)
+# determine alpha
+iterateAlpha(X_classify, y_classify, LogReg)
 
 # define the number of partitions
 n = 10
