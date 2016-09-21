@@ -73,11 +73,11 @@ class LinearRegressor:
     def train(self,gd=True):
     	if not gd:
     		wts = self.closed_form_solve(self.X,self.y)
-    		#print "OPTIMAL WEIGHTS: " + str(wts)
+    		print "OPTIMAL WEIGHTS: " + str(wts)
     	else:
     		wts, cost_history = self.gradient_descent(self.X,self.y)
-    		#print "ENDED AFTER " + str(len(cost_history)) + " GRADIENT ITERATIONS"
-    		#print "OPTIMAL WEIGHTS: " + str(wts)
+    		print "Ended after" + str(len(cost_history)) + "iterations"
+    		print "Optimal weights: " + str(wts)
     		return cost_history
 
 
@@ -146,8 +146,8 @@ class LogisticRegressor():
     def train(self):
     	wts, cost_history = self.gradient_descent(self.X,self.y)
     	#print "COST_HISTORY: " + str(cost_history)
-    	#print "Ended after " + str(len(cost_history)) + " iterations"
-    	#print "Optimal weights: " + str(wts)
+    	print "Ended after " + str(len(cost_history)) + " iterations"
+    	print "Optimal weights: " + str(wts)
     	return cost_history
 
 
