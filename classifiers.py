@@ -6,6 +6,7 @@
 import numpy as np
 import math
 import types
+from scipy.special import expit
 
 class LinearRegressor:
 	#USAGE: Declare the class with initial parameters X, y, and optionally alpha (necessary for hyperparameter tuning)
@@ -25,7 +26,7 @@ class LinearRegressor:
     	new_X = np.ones((self.m,self.n+1))
     	new_X[:,1:] = X
     	self.X = new_X
-    	self.w = np.random.rand(self.n+1)
+    	self.w = 1+np.random.rand(self.n+1)
 
     def predict(self,X):
     	try:
@@ -37,46 +38,47 @@ class LinearRegressor:
     		retvar = X.dot(self.w)
     	return retvar
 
-    def cost(self,X, y, w=None):
-        if w == None:
-            w = self.w
+    def cost(self,X, y):
+        w = self.w
     	prediction_matrix = self.predict(X)
     	difference = y - prediction_matrix
     	return (1/float(X.shape[0]))*difference.T.dot(difference)
 
     def deriv_cost(self,X, y, w):
-    	return 2*(X.T.dot(X).dot(w)-X.T.dot(y))
+    	return (1/float(X.shape[0]))*2*(X.T.dot(X).dot(w)-X.T.dot(y))
 
     def closed_form_solve(self,X ,y):
     	self.w = np.linalg.pinv(X.T.dot(X)).dot(X.T).dot(y)
     	return self.w
 
     def gradient_descent(self,X, y):
-    	current_best = self.cost(self.X, self.y, self.w)
+    	current_best = self.cost(self.X, self.y)
     	cost_history = []
-    	for _ in xrange(10000):
+    	for _ in xrange(1000):
     		self.w = self.w - self.alpha*self.deriv_cost(self.X, self.y, self.w)
-    		this_cost = self.cost(self.X, self.y, self.w)
-    		if abs(current_best - this_cost) < 0.1:
+    		this_cost = self.cost(self.X, self.y)
+    		if abs(current_best - this_cost) < 0.0001:
     			cost_history.append(this_cost)
     			return self.w, cost_history
     		else:
     			cost_history.append(this_cost)
     			current_best = this_cost
-    			if len(cost_history) > 4:
-    				if cost_history[-1] > cost_history[-2] and cost_history[-2] > cost_history[-3] and cost_history[-3] > cost_history[-4]:
-    					print "ALPHA TOO LARGE"
-    					return self.w, cost_history
+    			# if len(cost_history) > 4:
+    			# 	if cost_history[-1] > cost_history[-2] and cost_history[-2] > cost_history[-3] and cost_history[-3] > cost_history[-4]:
+    			# 		print "ALPHA TOO LARGE"
+    			# 		return self.w, cost_history
     	print "ALPHA TOO SMALL"
     	return self.w, cost_history
 
     def train(self,gd=True):
     	if not gd:
     		wts = self.closed_form_solve(self.X,self.y)
+            	print "COST:" + str(self.cost(self.X,self.y))
     		print "OPTIMAL WEIGHTS: " + str(wts)
     	else:
     		wts, cost_history = self.gradient_descent(self.X,self.y)
     		print "Ended after" + str(len(cost_history)) + "iterations"
+	        print "COST", self.cost(self.X,self.y)
     		print "Optimal weights: " + str(wts)
     		return cost_history
 
@@ -102,7 +104,12 @@ class LogisticRegressor():
     	self.w = np.random.rand(self.n+1)
 
     def sigmoid(self,x):
-        return 1/(1+np.exp(-x))
+        ret = 1/(1+expit(-x))
+        ret.tolist()
+        for i,v in enumerate(ret):
+            if v == 1:
+                ret[i] = 0.9999
+        return np.array(ret)
 
     def predict(self,X):
     	try:
@@ -114,24 +121,27 @@ class LogisticRegressor():
     		retvar = self.sigmoid(X.dot(self.w))
     	return retvar
 
-    def cost(self, X, y, w=None):
-        if w == None:
-            w = self.w
+    def cost(self, X, y):
+        w = self.w
         prediction = self.predict(X)
-        return -(1/float(X.shape[0]))*np.sum(-y.T.dot(np.log(prediction)) - (1-y.T).dot(np.log(prediction)))
-        #return -(1/float(X.shape[0]))*(y.T.dot(np.log(prediction)) + (1-y).T.dot(np.log(1-prediction)))
+        prediction = prediction.tolist()
+        for i,v in enumerate(prediction):
+            if v==0:
+                prediction[i] = 0.000000001
+        prediction = np.array(prediction)
+        return (1/float(X.shape[0]))*(-y.T.dot(np.log(prediction)) - (1-y).T.dot(np.log(1-prediction)))
 
     def deriv_cost(self, X, y, w):
         prediction = self.predict(X)
-        return X.T.dot(prediction-y)
+        return (1/float(X.shape[0]))*X.T.dot(prediction-y)
 
     def gradient_descent(self,X, y):
-    	current_best = self.cost(self.X, self.y, self.w)
+    	current_best = self.cost(self.X, self.y)
     	cost_history = []
-    	for _ in xrange(10000):
+    	for _ in xrange(1000):
     		self.w = self.w - self.alpha*self.deriv_cost(self.X, self.y, self.w)
-    		this_cost = self.cost(self.X, self.y, self.w)
-    		if abs(current_best - this_cost) < 0.001:
+    		this_cost = self.cost(self.X, self.y)
+    		if abs(current_best - this_cost) < 0.000000000000000000001:
     			cost_history.append(this_cost)
     			return self.w, cost_history
     		else:
@@ -146,10 +156,10 @@ class LogisticRegressor():
 
     def train(self):
     	wts, cost_history = self.gradient_descent(self.X,self.y)
-    	print "COST_HISTORY: " + str(cost_history)
-        raw_input()
+    	#print "COST_HISTORY: " + str(cost_history)
     	print "Ended after " + str(len(cost_history)) + " iterations"
     	#print "Optimal weights: " + str(wts)
+        print self.cost(self.X, self.y)
     	return cost_history
 
 
