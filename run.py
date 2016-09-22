@@ -1,3 +1,4 @@
+import csv
 import numpy as np
 from classifiers import LinearRegressor as LinReg
 import pickle
@@ -6,7 +7,7 @@ import math
 import time
 from cross_validation import crossValidate
 from classifiers import LinearRegressor as LogReg
-from sklearn.preprocessing import normalize
+import sys
 
 def iterateAlpha(X, y, regressor):
     alpha_list = []
@@ -37,8 +38,13 @@ X_linreg = loadPickle('data/X_participantDataForRaceTimes.p')
 X_classify = loadPickle('data/X_participantDataForRaceParticipation.p')
 y_linreg = loadPickle('data/Y_montrealMarathonTime.p')
 y_classify = loadPickle('data/Y_montrealMarathonParticipaton.p')
+X_final = loadPickle('data/final_participantDataFinalFor2016.p')
 y_classify = y_classify.tolist()
 y_classify = np.array(map(float, y_classify))
+from sklearn.preprocessing import normalize
+X_classify = normalize(X_classify)
+X_linreg = normalize(X_linreg)
+X_final = normalize(X_final)
 
 if len(X_linreg) != len(y_linreg):
     print "ERROR: regression datasets are of different lengths"
@@ -48,10 +54,6 @@ if len(X_classify) != len(y_classify):
 
 print("Using {0} instances for predicting race times").format(len(y_linreg))
 print("Using {0} instances for predicting participation").format(len(y_classify))
-
-# determine alpha
-X_classify = normalize(X_classify)
-X_linreg = normalize(X_linreg)
 
 
 # define the number of partitions
@@ -86,4 +88,30 @@ structures = [
 
 ]
 
-findBestModel(X_classify, y_classify, structures, LogReg, 10)
+
+#GET LOGISTIC REGRESSION PREDICTIONS
+#todo: square x_classify here
+r1 = LogReg(X_classify, y_classify)
+r1.train()
+LOGREG_FINAL = np.around(r1.predict(X_final))
+
+#GET LINEAR REGRESSION PREDICTIONS
+#todo: square x
+r2 = LinReg(X_linreg, y_linreg)
+r2.train()
+LINREG_FINAL = r2.predict(X_final)
+
+#GET NAIVE BAYES PREDICTIONS
+#todo: square x and train an NB
+#r3 = NB(X_classify, y_classify,???)
+# r3.train()
+# NB_FINAL = np.around(r3.predict(X_final))
+
+IDS = range(0,8711)
+IDS = np.array(IDS)
+
+#uncomment these at the end and then run!
+#OUTPUT = np.column_stack((IDS, LOGREG_FINAL, NB_FINAL, LINREG_FINAL))
+#np.savetxt("PREDICTION.csv", OUTPUT, delimiter=",")
+
+
