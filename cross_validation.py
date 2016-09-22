@@ -40,12 +40,12 @@ class FeatureMatrixGenerator(object):
             raise Exception("Structure dimension is off")
         self._structure = value
 
-    def deduceFeatureTypes(self, basicFTypes):
+    def deduceFeatureTypes(self, basicTypes):
         fTypes = []
         # power terms
         powerTerms = self.structure['powers']
         for i, powers in enumerate(powerTerms):
-            currType = basicTypes(i)
+            currType = basicTypes[i]
             for x in range(len(powers)):
                 fTypes.append(currType)
 
@@ -130,8 +130,6 @@ def get_avg_errors(errs):
     for i,v in enumerate(errs):
         totals[0] += v[0]
         totals[1] += v[1]
-    print totals
-    print map(lambda x: x/len(errs), totals)
     return map(lambda x: x/len(errs), totals)
 
 def get_index_of_min_err(data):
@@ -139,6 +137,11 @@ def get_index_of_min_err(data):
     v_errs = map(lambda (x,y): y, data)
     min_err = min(v_errs)
     return v_errs.index(min_err)
+
+def printErrors(errors):
+    for i, v in enumerate(errors):
+        print("{0}\t\t{1}\t\t{2}").format(i, v[0], v[1])
+
 
 def crossValidate(X, y, modelStructures, regressor, n):
     ''' takes in data and a list of model structures and returns the best model
@@ -190,18 +193,23 @@ def crossValidateNB(X, y, featureTypes, modelStructures, n):
             nb = NB(X, y, fTypes)
             nb.train()
             tPredictions = nb.predict(X, y)
-            tErr = nb.error(X, y, tPredictions)
+            tErr = nb.cost(X, y, tPredictions)
             fmgVal = FeatureMatrixGenerator(validationSet[0], structure)
             XVal = fmgVal.generate()
             yVal = np.array(validationSet[1])
             vPredictions = nb.predict(XVal, yVal)
-            vErr = nb.error(XVal, yVal, vPredictions)
+            vErr = nb.cost(XVal, yVal, vPredictions)
             currModelErrors.append([tErr, vErr])
+        # print the errors for the n tests of the current model
+        print("Model: {0}").format(structure)
+        print "Errors:\niteration\ttrain (%)\tvalidation (%)"
+        printErrors(currModelErrors)
         errors.append(get_avg_errors(currModelErrors))
 
     bestModelIdx = get_index_of_min_err(errors)
-    print("Best model index: {0} \nBest model structure: {1}").format(bestModelIdx, modelStructures[bestModelIdx])
+    print "\n\n\n"
+    print "SUMMARY"
+    print("Best model (index {0}): {1}").format(bestModelIdx, modelStructures[bestModelIdx])
     print "Model errors:\nmodel\ttrain\tvalidation"
-    for i, v in enumerate(errors):
-        print("{0}\t{1}\t{2}").format(i, v[0], v[1])
+    printErrors(errors)
     return bestModelIdx
