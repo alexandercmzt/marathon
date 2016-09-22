@@ -117,10 +117,10 @@ for i,v in enumerate(LINREG_FINAL):
 
 
 OUTPUT = np.array([IDS, LOGREG_FINAL, NB_FINAL LINREG_FINAL]).T.tolist()
-with open("PREDICTIONS.csv", "wb") as f:
+with open("predictions.csv", "wb") as f:
     writer = csv.writer(f)
     writer.writerows(OUTPUT)
 
-print "Successfully outputted predictions to PREDICTIONS.CSV in current directory"
+print "Successfully outputted predictions to predictions.csv in current directory"
 
 
