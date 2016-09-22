@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 from classifiers import LinearRegressor as LinReg
+from classifiers import LogisticRegressor
 import pickle
 from classifiers import NaiveBayes as NB
 import math
@@ -88,30 +89,38 @@ structures = [
 
 ]
 
+IDS = range(0,8711)
+
+#TODO:
+#Square features in X_classify here
+#Square features in X_linreg here
+#Square features in X_final here
+#Train the NB and uncomment it below. Don't touch the last line, I need it in that format!
 
 #GET LOGISTIC REGRESSION PREDICTIONS
-#todo: square x_classify here
 r1 = LogReg(X_classify, y_classify)
 r1.train()
-LOGREG_FINAL = np.around(r1.predict(X_final))
-
-#GET LINEAR REGRESSION PREDICTIONS
-#todo: square x
-r2 = LinReg(X_linreg, y_linreg)
-r2.train()
-LINREG_FINAL = r2.predict(X_final)
+LOGREG_FINAL = map(str,np.around(r1.predict(X_final)).tolist())
 
 #GET NAIVE BAYES PREDICTIONS
-#todo: square x and train an NB
-#r3 = NB(X_classify, y_classify,???)
-# r3.train()
-# NB_FINAL = np.around(r3.predict(X_final))
+#Todo: Idk how you run it, you do it :P
+#r3 = NB(X_classify, y_classify,???) <-- What's this param/how do I get it?
+#r3.train() 
+#NB_FINAL = map(str,np.around(r3.predict(X_final)).tolist())
 
-IDS = range(0,8711)
-IDS = np.array(IDS)
+#GET LINEAR REGRESSION PREDICTIONS
+r2 = LinReg(X_linreg, y_linreg)
+r2.train()
+LINREG_FINAL = r2.predict(X_final).tolist()
+for i,v in enumerate(LINREG_FINAL):
+    LINREG_FINAL[i] = time.strftime('%H:%M:%S', time.gmtime(v))
 
-#uncomment these at the end and then run!
-#OUTPUT = np.column_stack((IDS, LOGREG_FINAL, NB_FINAL, LINREG_FINAL))
-#np.savetxt("PREDICTION.csv", OUTPUT, delimiter=",")
+
+OUTPUT = np.array([IDS, LOGREG_FINAL, NB_FINAL LINREG_FINAL]).T.tolist()
+with open("PREDICTIONS.csv", "wb") as f:
+    writer = csv.writer(f)
+    writer.writerows(OUTPUT)
+
+print "Successfully outputted predictions to PREDICTIONS.CSV in current directory"
 
 
