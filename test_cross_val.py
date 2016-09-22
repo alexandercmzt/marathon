@@ -8,7 +8,7 @@ from sklearn.preprocessing import normalize
 
 def iterateAlpha(X, y, regressor):
     alpha_list = []
-    start = 1
+    start = 0.0000001
     for i in range(10):
         alpha_list.append(start)
         start *= 10
@@ -35,6 +35,8 @@ X_linreg = loadPickle('data/X_participantDataForRaceTimes.p')
 X_classify = loadPickle('data/X_participantDataForRaceParticipation.p')
 y_linreg = loadPickle('data/Y_montrealMarathonTime.p')
 y_classify = loadPickle('data/Y_montrealMarathonParticipaton.p')
+y_classify = y_classify.tolist()
+y_classify = np.array(map(float, y_classify))
 
 if len(X_linreg) != len(y_linreg):
     print "ERROR: regression datasets are of different lengths"
@@ -46,11 +48,35 @@ print("Using {0} instances for predicting race times").format(len(y_linreg))
 print("Using {0} instances for predicting participation").format(len(y_classify))
 
 # determine alpha
-np.set_printoptions(threshold=np.inf)
 X_classify = normalize(X_classify)
 X_linreg = normalize(X_linreg)
 
-#iterateAlpha(X_classify, y_classify, LogReg) # USE ALPHA=10 for log reg, use train(gd=False) for lin reg!!!
+# r1 = LogReg(X_classify,y_classify)
+# r1.train()
+# p= r1.predict(X_classify)
+# print len(y_classify) - len([x for x in y_classify-p if x !=0])
+# print p
+# print y_classify
+# raw_input()
+
+# from sklearn.linear_model import LogisticRegression
+# r1 = LogisticRegression()
+# r1.fit(X_classify,y_classify)
+# print r1.predict(X_classify)
+# raw_input()
+
+from sklearn.linear_model import LinearRegression
+r1 = LinearRegression()
+r1.fit(X_linreg[:-100],y_linreg[:-100])
+r2 = LinReg(X_linreg[:-100],y_linreg[:-100])
+r2.train()
+print r1.predict(X_linreg[-100:])
+print y_linreg[-100:]
+print r2.predict(X_linreg[-100:])
+raw_input()
+
+# iterateAlpha(X_classify, y_classify, LogReg) # USE ALPHA=10 for log reg, use train(gd=False) for lin reg!!!
+# raw_input()
 
 # define the number of partitions
 n = 10
@@ -60,9 +86,28 @@ structures = [
     {
         'powers': [ [1] for x in xrange(X_linreg.shape[1]) ],
         'products': []
+    },
+    {
+        'powers': [ [1,2] for x in xrange(X_linreg.shape[1]) ],
+        'products': []
+    },
+    {
+        'powers': [ [1,2,3] for x in xrange(X_linreg.shape[1]) ],
+        'products': []
+    },
+    {
+        'powers': [ [1,2,3,4] for x in xrange(X_linreg.shape[1]) ],
+        'products': []
+    },
+    {
+        'powers': [ [1,2,3,4,5,6] for x in xrange(X_linreg.shape[1]) ],
+        'products': []
+    },
+    {
+        'powers': [ [1,2,3,4,5,6,7] for x in xrange(X_linreg.shape[1]) ],
+        'products': []
     }
+
 ]
 
-regressor = LinReg
-
-#findBestModel()
+findBestModel(X_linreg, y_linreg, structures, LinReg, 10)
