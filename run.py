@@ -54,19 +54,6 @@ X_classify = normalize(X_classify)
 X_linreg = normalize(X_linreg)
 
 
-# from sklearn.linear_model import LogisticRegression
-# r1 = LogisticRegression()
-# r1.fit(X_classify[:-100],y_classify[:-100])
-# r2 = LogReg(X_classify[:-100],y_classify[:-100])
-# r2.train()
-# np.set_printoptions(threshold=np.inf)
-# print r1.predict(X_classify[-100:])
-# print np.around(r2.predict(X_classify[-100:]))
-# print y_classify[-100:]
-# print [x for x in np.around(r2.predict(X_classify[-100:])) - y_classify[-100:] if x != 0]
-# raw_input()
-
-
 # define the number of partitions
 n = 10
 
