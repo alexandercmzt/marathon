@@ -170,13 +170,17 @@ def crossValidate(X, y, modelStructures, regressor, n):
             yVal = np.array(validationSet[1])
             validationErr = lr.cost(XVal, yVal)
             currModelErrors.append([trainErr, validationErr])
+            print("Model: {0}").format(structure)
+            print "Errors:\niteration\ttrain\tvalidation"
+            printErrors(currModelErrors)
         errors.append(get_avg_errors(currModelErrors))
 
     bestModelIdx = get_index_of_min_err(errors)
-    print("Best model index: {0} \nBest model structure: {1}").format(bestModelIdx, modelStructures[bestModelIdx])
+    print "\n\n\n"
+    print "SUMMARY"
+    print("Best model (index {0}): {1}").format(bestModelIdx, modelStructures[bestModelIdx])
     print "Model errors:\nmodel\ttrain\tvalidation"
-    for i, v in enumerate(errors):
-        print("{0}\t{1}\t{2}").format(i, v[0], v[1])
+    printErrors(errors)
     return bestModelIdx
 
 def crossValidateNB(X, y, featureTypes, modelStructures, n):
