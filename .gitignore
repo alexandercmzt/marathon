@@ -1,2 +1,2 @@
-cross_validation.pyc
-classifiers.pyc
+# ignore compiled python bytecode
+.pyc
