@@ -175,7 +175,7 @@ class NaiveBayes:
     def compose(self, X, y):
         composed = []
         for i, v in enumerate(X):
-            entry = v.append(y[i])
+            entry = np.append(v, y[i])
             composed.append(entry)
         return composed
 
