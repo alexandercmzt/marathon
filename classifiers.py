@@ -4,6 +4,7 @@
 # Usage of classes is described below in a comment at the start of each class
 
 import numpy as np
+from numpy import e
 import math
 import types
 from scipy.special import expit
@@ -104,7 +105,7 @@ class LogisticRegressor():
     	self.w = np.random.rand(self.n+1)
 
     def sigmoid(self,x):
-        return 1.0/(1.0+expit(-x))
+        return 1.0/(1.0+(np.exp(-x)))
 
     def predict(self,X):
     	try:

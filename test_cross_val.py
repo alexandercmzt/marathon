@@ -1,9 +1,11 @@
 import numpy as np
-import pickle
-from cross_validation import crossValidate
 from classifiers import LinearRegressor as LinReg
-from classifiers import LogisticRegressor as LogReg
+import pickle
 from classifiers import NaiveBayes as NB
+import math
+import time
+from cross_validation import crossValidate
+from classifiers import LinearRegressor as LogReg
 from sklearn.preprocessing import normalize
 
 def iterateAlpha(X, y, regressor):
@@ -51,32 +53,19 @@ print("Using {0} instances for predicting participation").format(len(y_classify)
 X_classify = normalize(X_classify)
 X_linreg = normalize(X_linreg)
 
-# r1 = LogReg(X_classify,y_classify)
-# r1.train()
-# p= r1.predict(X_classify)
-# print len(y_classify) - len([x for x in y_classify-p if x !=0])
-# print p
-# print y_classify
-# raw_input()
 
 # from sklearn.linear_model import LogisticRegression
 # r1 = LogisticRegression()
-# r1.fit(X_classify,y_classify)
-# print r1.predict(X_classify)
+# r1.fit(X_classify[:-100],y_classify[:-100])
+# r2 = LogReg(X_classify[:-100],y_classify[:-100])
+# r2.train()
+# np.set_printoptions(threshold=np.inf)
+# print r1.predict(X_classify[-100:])
+# print np.around(r2.predict(X_classify[-100:]))
+# print y_classify[-100:]
+# print [x for x in np.around(r2.predict(X_classify[-100:])) - y_classify[-100:] if x != 0]
 # raw_input()
 
-from sklearn.linear_model import LinearRegression
-r1 = LinearRegression()
-r1.fit(X_linreg[:-100],y_linreg[:-100])
-r2 = LinReg(X_linreg[:-100],y_linreg[:-100])
-r2.train()
-print r1.predict(X_linreg[-100:])
-print y_linreg[-100:]
-print r2.predict(X_linreg[-100:])
-raw_input()
-
-# iterateAlpha(X_classify, y_classify, LogReg) # USE ALPHA=10 for log reg, use train(gd=False) for lin reg!!!
-# raw_input()
 
 # define the number of partitions
 n = 10
@@ -110,4 +99,4 @@ structures = [
 
 ]
 
-findBestModel(X_linreg, y_linreg, structures, LinReg, 10)
+findBestModel(X_classify, y_classify, structures, LogReg, 10)
