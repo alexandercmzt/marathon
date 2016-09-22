@@ -130,8 +130,6 @@ def get_avg_errors(errs):
     for i,v in enumerate(errs):
         totals[0] += v[0]
         totals[1] += v[1]
-    print totals
-    print map(lambda x: x/len(errs), totals)
     return map(lambda x: x/len(errs), totals)
 
 def get_index_of_min_err(data):
