@@ -108,14 +108,14 @@ X_classify = fmg_classify.generate()
 X_final = fmg_final.generate()
 
 #GET LOGISTIC REGRESSION PREDICTIONS
-r1 = LogReg(X_classify, y_classify)
+r1 = LogReg(X_classify2, y_classify)
 r1.train()
-LOGREG_FINAL = map(str,np.around(r1.predict(X_final)).tolist())
+LOGREG_FINAL = map(str,np.around(r1.predict(X_final2)).tolist())
 
 #GET LINEAR REGRESSION PREDICTIONS
-r2 = LinReg(X_linreg, y_linreg)
+r2 = LinReg(X_linreg2, y_linreg)
 r2.train()
-LINREG_FINAL = r2.predict(X_final).tolist()
+LINREG_FINAL = r2.predict(X_final2).tolist()
 for i,v in enumerate(LINREG_FINAL):
     LINREG_FINAL[i] = time.strftime('%H:%M:%S', time.gmtime(v))
 
