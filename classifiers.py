@@ -399,7 +399,7 @@ class NaiveBayes:
         dataSet = self.compose(X, y)
         return self.getPredictions(self.summaries, dataSet)
 
-    def predict(self, X, y, ratio):
+    def predictDynamic(self, X, y, ratio):
         dataSet = self.compose(X, y)
         return self.getPredictionsForDynamicDecisionBoundary(self.summaries, dataSet, ratio)
 

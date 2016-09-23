@@ -249,7 +249,7 @@ def getBestDecisionBoundary(X, y, featureTypes, model, n):
             fmgVal = FeatureMatrixGenerator(validationSet[0], model)
             XVal = fmgVal.generate()
             yVal = np.array(validationSet[1])
-            vPredictions = nb.predict(XVal, yVal, ratio)
+            vPredictions = nb.predictDynamic(XVal, yVal, ratio)
             currRatioStats.append(nb.getExtendedStats(XVal, yVal, vPredictions))
         stats.append([ratio, get_avg_stats(currRatioStats)])
 
