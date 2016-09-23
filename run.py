@@ -43,9 +43,6 @@ X_final = loadPickle('data/final_participantDataFinalFor2016.p')
 y_classify = y_classify.tolist()
 y_classify = np.array(map(float, y_classify))
 from sklearn.preprocessing import normalize
-X_classify = normalize(X_classify)
-X_linreg = normalize(X_linreg)
-X_final = normalize(X_final)
 
 if len(X_linreg) != len(y_linreg):
     print "ERROR: regression datasets are of different lengths"
@@ -112,6 +109,10 @@ p2_model = {
     'products': []
 }
 
+X_classify = normalize(X_classify)
+X_linreg = normalize(X_linreg)
+X_final = normalize(X_final)
+
 fmg_lin_reg = FeatureMatrixGenerator(X_linreg, p2_model)
 fmg_classify = FeatureMatrixGenerator(X_classify, p2_model)
 fmg_final = FeatureMatrixGenerator(X_final, p2_model)
@@ -123,7 +124,7 @@ X_final2 = fmg_final.generate()
 #GET LOGISTIC REGRESSION PREDICTIONS
 r1 = LogReg(X_classify2, y_classify)
 r1.train()
-LOGREG_FINAL = map(str,np.around(r1.predict(X_final2)).tolist())
+LOGREG_FINAL = map(str,map(abs,np.around(r1.predict(X_final2)).tolist()))
 
 #GET LINEAR REGRESSION PREDICTIONS
 r2 = LinReg(X_linreg2, y_linreg)
