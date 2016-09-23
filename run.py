@@ -91,9 +91,22 @@ structures = [
 
 IDS = range(0,8711)
 
-X_classify_nb = X_classify
-X_final_nb = X_final
+# Naive Bayes set up
+p1_model = {
+    'powers': [ [1] for x in xrange(X_linreg.shape[1]) ],
+    'products': []
+}
 
+X_classify_nb = X_classify
+y_classify_nb = np.array(y_classify)
+fmg_nb = FeatureMatrixGenerator(X_classify_nb, p1_model)
+X_classify_nb = fmg_nb.generate()
+
+X_final_nb = X_final
+fmg_nb_final = FeatureMatrixGenerator(X_final_nb, p1_model)
+X_final_nb = fmg_nb_final.generate()
+
+# Lin reg and log reg set up
 p2_model = {
     'powers': [ [1,2] for x in xrange(X_linreg.shape[1]) ],
     'products': []
@@ -121,9 +134,9 @@ for i,v in enumerate(LINREG_FINAL):
 
 #GET NAIVE BAYES PREDICTIONS
 types = [True, True, True, True, False, True, True, True]
-r3 = NB(X_classify_nb, y_classify, types)
+r3 = NB(X_classify_nb, y_classify_nb, types)
 r3.train()
-y_final_nb = ['?' for i in len(X_final_nb)]
+y_final_nb = np.array([0 for i in range(len(X_final_nb))])
 NB_FINAL = map(str,np.around(r3.predict(X_final_nb, y_final_nb)).tolist())
 
 OUTPUT = np.array([IDS, LOGREG_FINAL, NB_FINAL, LINREG_FINAL]).T.tolist()
