@@ -140,7 +140,7 @@ def get_index_of_min_err(data):
 
 def printErrors(errors):
     for i, v in enumerate(errors):
-        print("{0}\t\t{1}\t\t{2}").format(i, v[0], v[1])
+        print("{0}\t{1}\t{2}").format(i, v[0], v[1])
 
 
 def crossValidate(X, y, modelStructures, regressor, n):
@@ -217,3 +217,43 @@ def crossValidateNB(X, y, featureTypes, modelStructures, n):
     print "Model errors:\nmodel\ttrain\tvalidation"
     printErrors(errors)
     return bestModelIdx
+
+def sum(l):
+    total = 0
+    for v in l:
+        total += v
+    return total
+
+def get_avg_stats(stats):
+    clusteredStats = zip(*stats)
+    return [sum(x)/float(len(x)) for x in clusteredStats]
+
+def printStats(stats):
+    for v in stats:
+        print("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}").format(v[0], v[1][0], v[1][1], v[1][2], v[1][3], v[1][4], v[1][5], v[1][6], v[1][7], v[1][8], v[1][9], v[1][10], v[1][11])
+
+# get data to determine best decision boundary ratio for Naive Bayes
+def getBestDecisionBoundary(X, y, featureTypes, model, n):
+    dataPartitioner = DataPartitioner(n, X, y)
+    stats = []
+    for ratio in np.arange(0.1, 2.5, 0.1):
+        currRatioStats = []
+        for i in range(n):
+            trainingSet, validationSet = dataPartitioner.getPartitions(i)
+            fmg = FeatureMatrixGenerator(trainingSet[0], model)
+            X = fmg.generate()
+            y = np.array(trainingSet[1])
+            fTypes = fmg.deduceFeatureTypes(featureTypes)
+            nb = NB(X, y, fTypes)
+            nb.train()
+            fmgVal = FeatureMatrixGenerator(validationSet[0], model)
+            XVal = fmgVal.generate()
+            yVal = np.array(validationSet[1])
+            vPredictions = nb.predict(XVal, yVal, ratio)
+            currRatioStats.append(nb.getExtendedStats(XVal, yVal, vPredictions))
+        stats.append([ratio, get_avg_stats(currRatioStats)])
+
+    print "\n\n\n"
+    print "SUMMARY"
+    print "Stats:\nratio\terror\ttotal entries\ttotal correct\ttotal incorrect\ttotal actual 0\ttotal predicted 0\ttotal actual 1\ttotal predicted 1\ttrue positives\t false positives\ttrue negatives\tfalse negatives"
+    printStats(stats)

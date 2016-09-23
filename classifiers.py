@@ -312,6 +312,21 @@ class NaiveBayes:
                 bestProb = probability
         return bestLabel
 
+    def predictSingleInstanceDynamic(self, summaries, inputVector, ratio):
+        '''
+        this method only applies to binary classification
+        given the class summaries and an input vector, predicts the class of the input
+        ratio allows for a flexible decision boudary as follows:
+        a ratio of n indicates that if (prob positive classification/prob negative classification) >= n
+        then the instance will be classified as positive (1), and negative (0) otherwise
+        '''
+        probabilities = self.calculateProbabilitiesByClass(summaries, inputVector)
+        positiveProb = probabilities[1]
+        negativeProb = probabilities[0]
+        if (positiveProb / negativeProb) >= ratio:
+            return 1
+        return 0
+
     def getPredictions(self, summaries, testSet):
         '''
         returns an array of classification predictions for the instances in a test set
@@ -322,19 +337,59 @@ class NaiveBayes:
             predictions.append(result)
         return predictions
 
+    def getPredictionsForDynamicDecisionBoundary(self, summaries, testSet, ratio):
+        predictions = []
+        for i in range(len(testSet)):
+            result = self.predictSingleInstanceDynamic(summaries, testSet[i], ratio)
+            predictions.append(result)
+        return predictions
+
     ##
     # We'll want to know how accurate our predictions are
     ##
+
+    def getAllStats(self, testSet, predictions):
+        '''
+        returns a bunch of statistics about the quality of the classification
+        '''
+        total_entries = len(predictions)
+        total_incorrect = 0
+        actual_class_0 = 0
+        predicted_class_0 = 0
+        true_positives = 0
+        false_positives = 0
+        true_negatives = 0
+        false_negatives = 0
+        for i in range(len(testSet)):
+            if testSet[i][-1] == 0:
+                actual_class_0 += 1
+            if predictions[i] == 0:
+                predicted_class_0 += 1
+            if testSet[i][-1] == predictions[i]:
+                if predictions[i] == 0:
+                    true_negatives += 1
+                else:
+                    true_positives += 1
+            else:
+                total_incorrect += 1
+                if testSet[i][-1] == 0:
+                    false_positives += 1
+                else:
+                    false_negatives += 1
+
+        # return % error, total entries, total correct, total incorrect, total actual class 0, total predicted class 0, same for class 1, true positives, false positives, true negatives, false negatives
+        return [float(total_incorrect)/total_entries * 100.0, total_entries, total_entries - total_incorrect, total_incorrect, actual_class_0, predicted_class_0, len(testSet) - actual_class_0, len(testSet) - predicted_class_0, true_positives, false_positives, true_negatives, false_negatives]
 
     def getAccuracy(self, testSet, predictions):
         '''
         returns the percentage of the test set that were classified correctly
         '''
-        correct = 0
+        total_incorrect = 0
         for i in range(len(testSet)):
-            if testSet[i][-1] == predictions[i]:
-                correct += 1
-        return (correct/float(len(testSet))) * 100.0
+            if testSet[i][-1] != predictions[i]:
+                total_incorrect += 1
+
+        return (total_incorrect/float(len(testSet))) * 100.0
 
     def train(self):
         self.summaries = self.summarizeByClass(self.featureTypes, self.trainingSet)
@@ -344,6 +399,14 @@ class NaiveBayes:
         dataSet = self.compose(X, y)
         return self.getPredictions(self.summaries, dataSet)
 
+    def predict(self, X, y, ratio):
+        dataSet = self.compose(X, y)
+        return self.getPredictionsForDynamicDecisionBoundary(self.summaries, dataSet, ratio)
+
     def cost(self, X, y, predictions):
         testSet = self.compose(X, y)
-        return 100.0 - self.getAccuracy(testSet, predictions)
+        return self.getAccuracy(testSet, predictions)
+
+    def getExtendedStats(self, X, y, predictions):
+        testSet = self.compose(X, y)
+        return self.getAllStats(testSet, predictions)
