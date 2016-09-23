@@ -6,8 +6,9 @@ import pickle
 from classifiers import NaiveBayes as NB
 import math
 import time
-from cross_validation import crossValidate
+from cross_validation import crossValidate, FeatureMatrixGenerator
 from classifiers import LinearRegressor as LogReg
+from sklearn.preprocessing import normalize
 import sys
 
 def iterateAlpha(X, y, regressor):
@@ -42,7 +43,6 @@ y_classify = loadPickle('data/Y_montrealMarathonParticipaton.p')
 X_final = loadPickle('data/final_participantDataFinalFor2016.p')
 y_classify = y_classify.tolist()
 y_classify = np.array(map(float, y_classify))
-from sklearn.preprocessing import normalize
 X_classify = normalize(X_classify)
 X_linreg = normalize(X_linreg)
 X_final = normalize(X_final)
@@ -91,22 +91,26 @@ structures = [
 
 IDS = range(0,8711)
 
-#TODO:
-#Square features in X_classify here
-#Square features in X_linreg here
-#Square features in X_final here
-#Train the NB and uncomment it below. Don't touch the last line, I need it in that format!
+X_classify_nb = X_classify
+X_final_nb = X_final
+
+p2_model = {
+    'powers': [ [1,2] for x in xrange(X_linreg.shape[1]) ],
+    'products': []
+}
+
+fmg_lin_reg = FeatureMatrixGenerator(X_linreg, p2_model)
+fmg_classify = FeatureMatrixGenerator(X_classify, p2_model)
+fmg_final = FeatureMatrixGenerator(X_final, p2_model)
+
+X_linreg = fmg_lin_reg.generate()
+X_classify = fmg_classify.generate()
+X_final = fmg_final.generate()
 
 #GET LOGISTIC REGRESSION PREDICTIONS
 r1 = LogReg(X_classify, y_classify)
 r1.train()
 LOGREG_FINAL = map(str,np.around(r1.predict(X_final)).tolist())
-
-#GET NAIVE BAYES PREDICTIONS
-#Todo: Idk how you run it, you do it :P
-#r3 = NB(X_classify, y_classify,???) <-- What's this param/how do I get it?
-#r3.train() 
-#NB_FINAL = map(str,np.around(r3.predict(X_final)).tolist())
 
 #GET LINEAR REGRESSION PREDICTIONS
 r2 = LinReg(X_linreg, y_linreg)
@@ -115,12 +119,16 @@ LINREG_FINAL = r2.predict(X_final).tolist()
 for i,v in enumerate(LINREG_FINAL):
     LINREG_FINAL[i] = time.strftime('%H:%M:%S', time.gmtime(v))
 
+#GET NAIVE BAYES PREDICTIONS
+types = [True, True, True, True, False, True, True, True]
+r3 = NB(X_classify_nb, y_classify, types)
+r3.train()
+y_final_nb = ['?' for i in len(X_final_nb)]
+NB_FINAL = map(str,np.around(r3.predict(X_final_nb, y_final_nb)).tolist())
 
-OUTPUT = np.array([IDS, LOGREG_FINAL, NB_FINAL LINREG_FINAL]).T.tolist()
+OUTPUT = np.array([IDS, LOGREG_FINAL, NB_FINAL, LINREG_FINAL]).T.tolist()
 with open("predictions.csv", "wb") as f:
     writer = csv.writer(f)
     writer.writerows(OUTPUT)
 
 print "Successfully outputted predictions to predictions.csv in current directory"
-
-
