@@ -22,7 +22,7 @@ class FeatureMatrixGenerator(object):
 
     @X.setter
     def X(self, value):
-        if not value:
+        if value == None:
             raise Exception("X cannot be empty")
         elif len(value) == 0:
             raise Exception("X must contain data")
