@@ -8,7 +8,6 @@ import math
 import time
 from cross_validation import crossValidate, FeatureMatrixGenerator
 from classifiers import LinearRegressor as LogReg
-from sklearn.preprocessing import normalize
 import sys
 
 def iterateAlpha(X, y, regressor):
@@ -43,6 +42,7 @@ y_classify = loadPickle('data/Y_montrealMarathonParticipaton.p')
 X_final = loadPickle('data/final_participantDataFinalFor2016.p')
 y_classify = y_classify.tolist()
 y_classify = np.array(map(float, y_classify))
+from sklearn.preprocessing import normalize
 X_classify = normalize(X_classify)
 X_linreg = normalize(X_linreg)
 X_final = normalize(X_final)
@@ -103,9 +103,9 @@ fmg_lin_reg = FeatureMatrixGenerator(X_linreg, p2_model)
 fmg_classify = FeatureMatrixGenerator(X_classify, p2_model)
 fmg_final = FeatureMatrixGenerator(X_final, p2_model)
 
-X_linreg = fmg_lin_reg.generate()
-X_classify = fmg_classify.generate()
-X_final = fmg_final.generate()
+X_linreg2 = fmg_lin_reg.generate()
+X_classify2 = fmg_classify.generate()
+X_final2 = fmg_final.generate()
 
 #GET LOGISTIC REGRESSION PREDICTIONS
 r1 = LogReg(X_classify2, y_classify)
